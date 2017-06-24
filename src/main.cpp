@@ -33,7 +33,8 @@ string hasData(string s) {
 }
 
 // Evaluate a polynomial.
-double polyeval(Eigen::VectorXd coeffs, double x) {
+double polyeval(Eigen::VectorXd coeffs, double x)
+{
   double result = 0.0;
   for (int i = 0; i < coeffs.size(); i++) {
     result += coeffs[i] * pow(x, i);
@@ -65,6 +66,30 @@ Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
   return result;
 }
 
+static Eigen::MatrixXd TransformCoordinates(
+  const vector<double>& ptsx,
+  const vector<double>& ptsy,
+  double translate_x,
+  double translate_y,
+  double rotate_psi)
+{
+  const int num_points = ptsx.size();
+  Eigen::MatrixXd TransformedCoordinates(num_points,2);
+
+  TransformedCoordinates << Eigen::Map<const Eigen::VectorXd>(ptsx.data(), ptsx.size()),
+                            Eigen::Map<const Eigen::VectorXd>(ptsy.data(), ptsy.size());
+
+  // translate coordinates
+  TransformedCoordinates.rowwise() -= Eigen::RowVector2d(translate_x,
+                                                         translate_y);
+
+  // setup rotation matrix
+  Eigen::Matrix2d rotation_matrix;
+  rotation_matrix << cos(-rotate_psi), -sin(-rotate_psi), -sin(-rotate_psi), -cos(-rotate_psi);
+  // rotate coordinates
+  return TransformedCoordinates * rotation_matrix.transpose();
+}
+
 int main() {
   uWS::Hub h;
 
@@ -85,21 +110,35 @@ int main() {
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          vector<double> ptsx = j[1]["ptsx"];
-          vector<double> ptsy = j[1]["ptsy"];
-          double px = j[1]["x"];
-          double py = j[1]["y"];
-          double psi = j[1]["psi"];
+          vector<double> ptsx = j[1]["ptsx"]; // x-waypoints
+          vector<double> ptsy = j[1]["ptsy"]; // y-waypoints
+          double px = j[1]["x"]; // x-postion of car
+          double py = j[1]["y"]; // y-postion of car
+          double psi = j[1]["psi"]; // angle of car
           double v = j[1]["speed"];
 
+          // transform waypoints to car cosy
+          const auto transformed_way_points = TransformCoordinates(ptsx, ptsy, px, py, psi);
+          const auto coeffs = polyfit(transformed_way_points.col(0), transformed_way_points.col(1),3);
+
+          // compute approximate cross track error by simply computing
+          const double cte = polyeval(coeffs, 0);
+          const double epsi = - atan(coeffs(1));
+
+          Eigen::VectorXd state(6);
+          state << 0, 0, 0, v, cte, epsi;
+
+
+          //const auto result = mpc.Solve(state, coeffs);
+          const double steer_angle =  0.0; //result[0];
+          const double steer_value = rad2deg(steer_angle) / 25;
+          const double throttle_value = 0.3; //result[1];
           /*
           * TODO: Calculate steering angle and throttle using MPC.
           *
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -107,10 +146,16 @@ int main() {
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle_value;
 
-          //Display the MPC predicted trajectory 
+          //Display the MPC predicted trajectory
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
 
+          int num_points = 25;
+          for(int i=0;i<num_points;i++)
+          {
+            mpc_x_vals.push_back(i*3.0);
+            mpc_y_vals.push_back(0.0);
+          }
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
@@ -118,9 +163,18 @@ int main() {
           msgJson["mpc_y"] = mpc_y_vals;
 
           //Display the waypoints/reference line
+
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
+          double poly_sample_interval = 2.5;
+          int num_sample_points = 25;
+          for(int i=0;i<num_sample_points;i++)
+          {
+            next_x_vals.push_back(i*poly_sample_interval);
+            // minus sign is confusing but needed to get the correct visualization
+            next_y_vals.push_back(-polyeval(coeffs,i*poly_sample_interval));
+          }
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
