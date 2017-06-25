@@ -15,8 +15,7 @@ to steer the car in the Udacity Self-Driving Car Simulator around a racetrack.
 4. Run it: `./mpc`.
 
 ## Videos ##
-Two videos of the car completing the course at roughly 40 mph and 80 mph can be
-found here  and  here
+Two videos of the car completing the course at roughly 40 mph and 80 mph can be found here https://youtu.be/eZcKhXgED60 and here https://youtu.be/j9wrlbY2iwU
 
 ## Vehicle model ##
 The bicycle model discussed in the lecture videos is used as motion model for the car.
