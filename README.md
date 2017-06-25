@@ -15,7 +15,7 @@ to steer the car in the Udacity Self-Driving Car Simulator around a racetrack.
 4. Run it: `./mpc`.
 
 ## Videos ##
-Two videos of the car completing the course at roughly 40 mph and 80 mph can be found here https://youtu.be/eZcKhXgED60 and here https://youtu.be/j9wrlbY2iwU
+Two videos of the car completing the course at roughly 40 mph and 80 mph can be found here https://youtu.be/eZcKhXgED60 and here https://youtu.be/j9wrlbY2iwU.
 
 ## Vehicle model ##
 The bicycle model discussed in the lecture videos is used as motion model for the car.
@@ -57,9 +57,7 @@ The desired trajectory of the car is provided in the form of way points given in
 a map coordinate system. To simplify the math, it is convenient to first transform
 these way points in the coordinate system of the car.
 
-In order to be able to evaluate deviations from the trajectory also between
-said way points, a third order polynomial is fitted to the six way points
-closest to the vehicle.  
+In order to be able to evaluate deviations from the trajectory also in between said way points, a third order polynomial is fitted to the six way points closest to the vehicle. This polynomial can then be evaluated at any desired location.
 
 Given the desired trajectory of the car and a model describing its motion under
 actuation, it is now possible to set up an optimization problem to find a set
@@ -76,7 +74,7 @@ I started out using 30 time-steps with a time-step size of `dt`= 50ms.
 This choice led to trajectory predictions that seemed unnecessary long, so I decreased
 the number of time-steps while also increasing the time step size to reduce computational
 cost. Through iterations I found that `N`=10 time-steps and a time-step of `dt`= 100ms yielded
-good results if the target speed of the car was set to 40 mph.
+good results if the target speed of the car was set to 40 or 80 mph.
 
 ### Cost Function with Penalty Factors ###
 The choice which terms to include in the cost function and how to weight the different
@@ -90,10 +88,10 @@ I then designed the following cost function:
 
 ```
 Cost = cte_weight* cte^2 + epsi_weight* e_psi^2 + ref_v_weight* e_vel^2
-        + delta_weight * delta^2 + a_weight * a^2 + deltadot_weight * d_delta^2 + adot_weight d_a^2 ,
+        + delta_weight * delta^2 + a_weight * a^2 + deltadot_weight * d_delta^2 + adot_weight d_a^2
 ```
 
-which penalizes any differences from the desired state, large values for actuators, a
+which penalizes any differences from the desired state, large values for actuators,
 and large changes in consecutive actuations. The above cost function has several tunable
 parameters. Namely, the factors with which the individual contributions can be weighted.
 Largely through try and error, I arrived at the following weights which resulted in a
