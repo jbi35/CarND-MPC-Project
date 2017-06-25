@@ -22,7 +22,7 @@ const double Lf = 2.67;
 // double cte_weight       = 1.0;	  // weighting of cross-track error
 // double epsi_weight      = 10.0;		// weighting of psi error
 // double ref_v_weight     = 1.0 ;		// weighting of velocity
-// double weight_weight    = 150.0;  // weighting of steering delta
+// double delta_weight    = 150.0;  // weighting of steering delta
 // double a_weight         = 10;			// weighting of acceleration
 // double deltadot_weight  = 30.0;   // weighting of steering delta rate of change
 // double adot_weight      = 1.0;		// weighting of acceleration rate of change
@@ -39,7 +39,7 @@ double ref_v = 80;
 double cte_weight       = 1.0;	  // weighting of cross-track error
 double epsi_weight      = 20.0;		// weighting of psi error
 double ref_v_weight     = 1.0 ;		// weighting of velocity
-double weight_weight    = 15000.0;  // weighting of steering delta
+double delta_weight    = 15000.0;  // weighting of steering delta
 double a_weight         = 10;			// weighting of acceleration
 double deltadot_weight  = 300.0;   // weighting of steering delta rate of change
 double adot_weight      = 2.0;		// weighting of acceleration rate of change
@@ -83,14 +83,14 @@ class FG_eval
       fg[0] += ref_v_weight*CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
-    // Minimize the use of actuators.
+    // penalize the use of actuators.
     for (int t = 0; t < N - 1; t++)
     {
-      fg[0] += weight_weight*CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += delta_weight*CppAD::pow(vars[delta_start + t], 2);
       fg[0] += a_weight*CppAD::pow(vars[a_start + t], 2);
     }
 
-    // Minimize the value gap between sequential actuations.
+    // Minimize the value gap between consecutive actuations.
     for (int t = 0; t < N - 2; t++)
     {
       fg[0] += deltadot_weight*CppAD::pow(vars[delta_start + t + 1] -
