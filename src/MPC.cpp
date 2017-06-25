@@ -15,34 +15,34 @@ const double Lf = 2.67;
 // weighting factors to tune the MPC behaviour
 // works for double ref_v = 40;
 // The reference velocity
-// double ref_v = 40;
-// //Set the timestep length and duration
-// size_t N = 10;
-// double dt = 0.10;
-// double cte_weight       = 1.0;	  // weighting of cross-track error
-// double epsi_weight      = 10.0;		// weighting of psi error
-// double ref_v_weight     = 1.0 ;		// weighting of velocity
-// double delta_weight    = 150.0;  // weighting of steering delta
-// double a_weight         = 10;			// weighting of acceleration
-// double deltadot_weight  = 30.0;   // weighting of steering delta rate of change
-// double adot_weight      = 1.0;		// weighting of acceleration rate of change
+double ref_v = 40;
+//Set the timestep length and duration
+size_t N = 10;
+double dt = 0.10;
+double cte_weight       = 1.0;	   // weighting of cross-track error
+double epsi_weight      = 10.0;	 // weighting of psi error
+double ref_v_weight     = 1.0 ;	 // weighting of velocity
+double delta_weight     = 150.0;  // weighting of steering delta
+double a_weight         = 10;		 // weighting of acceleration
+double deltadot_weight  = 30.0;   // weighting of steering delta rate of change
+double adot_weight      = 1.0;		 // weighting of acceleration rate of change
 
 
 //weighting factors to tune the MPC behaviour
 //works for double ref_v = 80;
 
 // //Set the timestep length and duration
-size_t N = 10;
-double dt = 0.10;
-// The reference velocity
-double ref_v = 80;
-double cte_weight       = 1.0;	  // weighting of cross-track error
-double epsi_weight      = 20.0;		// weighting of psi error
-double ref_v_weight     = 1.0 ;		// weighting of velocity
-double delta_weight    = 15000.0;  // weighting of steering delta
-double a_weight         = 10;			// weighting of acceleration
-double deltadot_weight  = 300.0;   // weighting of steering delta rate of change
-double adot_weight      = 2.0;		// weighting of acceleration rate of change
+// size_t N = 10;
+// double dt = 0.10;
+// // The reference velocity
+// double ref_v = 80;
+// double cte_weight       = 1.0;	  // weighting of cross-track error
+// double epsi_weight      = 20.0;		// weighting of psi error
+// double ref_v_weight     = 1.0 ;		// weighting of velocity
+// double delta_weight     = 15000.0;  // weighting of steering delta
+// double a_weight         = 10;			// weighting of acceleration
+// double deltadot_weight  = 300.0;   // weighting of steering delta rate of change
+// double adot_weight      = 2.0;		// weighting of acceleration rate of change
 
 
 // The solver takes all the state variables and actuator
